@@ -3,10 +3,8 @@
 namespace Moorscode\CommandQueue;
 
 /**
- * Created by PhpStorm.
- * User: jip
- * Date: 07/01/16
- * Time: 23:09
+ * Class MemoryStorage
+ * @package Moorscode\CommandQueue
  */
 class MemoryStorage implements StorageInterface {
 
@@ -79,9 +77,9 @@ class MemoryStorage implements StorageInterface {
 
 		$id = uniqid();
 
+		$item->setIdentifier( $id );
 		$this->priority[ $priority ][] = $id;
-
-		$this->commands[ $id ] = $item;
+		$this->commands[ $id ]         = $item;
 
 		return $id;
 	}

@@ -3,24 +3,22 @@
 namespace Moorscode\CommandQueue;
 
 /**
- * Class Priority
+ * Class CommandPriority
+ * @package Moorscode\CommandQueue
  */
-class CommandPriority {
-	const HIGH = 1000;
-	const NORMAL = 0;
-	const LOW = - 1000;
-
+class CommandPriority implements PriorityInterface {
 	/**
-	 * @var mixed
-	 */
-	private $status;
-
-	/**
-	 * Priority constructor.
+	 * Sanitizer
 	 *
 	 * @param int $in_status
+	 *
+	 * @return int
 	 */
-	public function __construct( $in_status = self::NORMAL ) {
+	public function sanitize( $in_status ) {
+		if ( is_null( $in_status ) ) {
+			$in_status = self::NORMAL;
+		}
+
 		$status = intval( $in_status );
 		$status = min( self::HIGH, max( self::LOW, $status ) );
 
@@ -28,13 +26,6 @@ class CommandPriority {
 			trigger_error( sprintf( 'Priority has been normalized from %s to %d.', $in_status, $status ), E_USER_NOTICE );
 		}
 
-		$this->status = $status;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function __toString() {
-		return (string) $this->status;
+		return $status;
 	}
 }

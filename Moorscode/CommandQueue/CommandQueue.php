@@ -4,41 +4,59 @@ namespace Moorscode\CommandQueue;
 
 /**
  * Class CommandQueue
+ * @package Moorscode\CommandQueue
  */
 class CommandQueue {
+	/**
+	 * @var CommandPriority
+	 */
+	private $prioritySanitizer;
+
 	/**
 	 * CommandQueue constructor.
 	 *
 	 * @param StorageInterface $storage
+	 * @param PriorityInterface $prioritySanitizer
 	 */
-	public function __construct( StorageInterface $storage = null ) {
-		$this->storage = $storage;
+	public function __construct( StorageInterface $storage, PriorityInterface $prioritySanitizer = null ) {
+		$this->storage           = $storage;
+		$this->prioritySanitizer = is_null( $prioritySanitizer ) ? new CommandPriority() : $prioritySanitizer;
 	}
 
 	/**
+	 * Add a new command to the queue
+	 *
 	 * @param CommandInterface $command
-	 * @param CommandPriority $priority
+	 * @param int $priority
 	 *
 	 * @return mixed
 	 */
-	public function add( CommandInterface $command, CommandPriority $priority = null ) {
-		$priority = is_null( $priority ) ? new CommandPriority() : $priority;
-		$priority = (string) $priority;
+	public function add( CommandInterface $command, $priority = null ) {
+		if ( ! is_null( $priority ) && ! is_numeric( $priority ) ) {
+			throw new \InvalidArgumentException( 'Expected number got ' . gettype( $priority ) );
+		}
+
+		$priority = $this->prioritySanitizer->sanitize( $priority );
 
 		// Add to storage
 		return $this->storage->addCommand( $command, $priority );
 	}
 
 	/**
+	 * Stack a command after another
+	 *
 	 * @param CommandInterface $command
 	 * @param string $prerequisite ID
-	 * @param CommandPriority $priority
+	 * @param int $priority
 	 *
 	 * @return mixed
 	 */
-	public function stack( CommandInterface $command, $prerequisite, CommandPriority $priority = null ) {
-		$priority = is_null( $priority ) ? new CommandPriority() : $priority;
-		$priority = (string) $priority;
+	public function stack( CommandInterface $command, $prerequisite, $priority = CommandPriority::NORMAL ) {
+		if ( ! is_numeric( $priority ) ) {
+			throw new \InvalidArgumentException( 'Expected number got ' . gettype( $priority ) );
+		}
+
+		$priority = $this->prioritySanitizer->sanitize( $priority );
 
 		// Add to storage
 		return $this->storage->stackCommand( $command, $prerequisite, $priority );
@@ -52,7 +70,7 @@ class CommandQueue {
 	public function next() {
 		// Get from storage
 		$command = $this->storage->getNextCommand();
-		if ( false === $command ) {
+		if ( empty( $command ) ) {
 			return null;
 		}
 
