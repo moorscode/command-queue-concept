@@ -1,5 +1,7 @@
 <?php
 
+namespace Moorscode\CommandQueue;
+
 /**
  * Class CommandQueue
  */
@@ -7,9 +9,9 @@ class CommandQueue {
 	/**
 	 * CommandQueue constructor.
 	 *
-	 * @param CommandQueueStorageInterface $storage
+	 * @param StorageInterface $storage
 	 */
-	public function __construct( CommandQueueStorageInterface $storage = null ) {
+	public function __construct( StorageInterface $storage = null ) {
 		$this->storage = $storage;
 	}
 
@@ -28,22 +30,35 @@ class CommandQueue {
 	}
 
 	/**
+	 * @param CommandInterface $command
+	 * @param string $prerequisite ID
+	 * @param CommandPriority $priority
+	 *
+	 * @return mixed
+	 */
+	public function stack( CommandInterface $command, $prerequisite, CommandPriority $priority = null ) {
+		$priority = is_null( $priority ) ? new CommandPriority() : $priority;
+		$priority = (string) $priority;
+
+		// Add to storage
+		return $this->storage->stackCommand( $command, $prerequisite, $priority );
+	}
+
+	/**
 	 * Run the next item from the queue.
 	 *
 	 * @return null|bool Nul on empty queue, bool from execution result.
 	 */
 	public function next() {
-		$identifier = uniqid( 'cmd_' );
-
 		// Get from storage
-		$command = $this->storage->getNextCommand( $identifier );
+		$command = $this->storage->getNextCommand();
 		if ( false === $command ) {
 			return null;
 		}
 
 		$result = $command->execute();
 
-		$this->storage->finishCommand( $identifier, $result );
+		$this->storage->finishCommand( $command, $result );
 
 		return $result;
 	}

@@ -1,6 +1,8 @@
 <?php
 
-class TestQueueStorage implements CommandQueueStorageInterface {
+namespace Moorscode\CommandQueue;
+
+class TestStorage implements StorageInterface {
 	/**
 	 * Add command to the queue
 	 *

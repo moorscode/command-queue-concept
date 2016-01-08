@@ -1,19 +1,43 @@
 <?php
 
+namespace Moorscode\CommandQueue;
+
 /**
  * Created by PhpStorm.
  * User: jip
  * Date: 07/01/16
  * Time: 23:09
  */
-class MemoryQueueStorage implements CommandQueueStorageInterface {
+class MemoryStorage implements StorageInterface {
 
-	private $priority = array();
+	/**
+	 * @var array
+	 */
 	private $commands = array();
+
+	/**
+	 * @var array
+	 */
+	private $priority = array();
+
+	/**
+	 * @var array
+	 */
 	private $processing = array();
 
+	/**
+	 * @var int
+	 */
 	private $completed = 0;
+
+	/**
+	 * @var int
+	 */
 	private $succeeded = 0;
+
+	/**
+	 * @var int
+	 */
 	private $failed = 0;
 
 	/**
@@ -25,7 +49,7 @@ class MemoryQueueStorage implements CommandQueueStorageInterface {
 	 * @return bool
 	 */
 	public function addCommand( CommandInterface $command, $priority ) {
-		return $this->addCommandItem( new CommandQueueItem( $command, $priority ) );
+		return $this->addCommandItem( new QueueItem( $command, $priority ) );
 	}
 
 	/**
@@ -36,18 +60,18 @@ class MemoryQueueStorage implements CommandQueueStorageInterface {
 	 * @return bool
 	 */
 	public function stackCommand( CommandInterface $command, $after_command_id, $priority ) {
-		$item = new CommandQueueItem( $command, $priority );
+		$item = new QueueItem( $command, $priority );
 		$item->setPrerequiste( $after_command_id );
 
 		return $this->addCommandItem( $item );
 	}
 
 	/**
-	 * @param CommandQueueItem $item
+	 * @param QueueItem $item
 	 *
 	 * @return string
 	 */
-	private function addCommandItem( CommandQueueItem $item ) {
+	private function addCommandItem( QueueItem $item ) {
 		$priority = $item->getPriority();
 		if ( ! isset( $this->priority[ $priority ] ) ) {
 			$this->priority[ $priority ] = array();
@@ -65,11 +89,9 @@ class MemoryQueueStorage implements CommandQueueStorageInterface {
 	/**
 	 * Get the next item from the queue and connect identifier to it
 	 *
-	 * @param string $identifier
-	 *
 	 * @return CommandInterface
 	 */
-	public function getNextCommand( $identifier ) {
+	public function getNextCommand() {
 		if ( empty( $this->commands ) ) {
 			return false;
 		}
@@ -114,23 +136,24 @@ class MemoryQueueStorage implements CommandQueueStorageInterface {
 
 		unset( $this->commands[ $id ] );
 
-		$this->processing[ $identifier ] = $item;
+		$this->processing[ $id ] = $item;
 
-		return $item->getCommand();
+		return $item;
 	}
 
 	/**
-	 * @param string $identifier
+	 * @param QueueItem $item
 	 * @param bool $succes
 	 *
 	 * @return bool
 	 */
-	public function finishCommand( $identifier, $succes ) {
-		if ( ! isset( $this->processing[ $identifier ] ) ) {
+	public function finishCommand( QueueItem $item, $succes ) {
+		$id = $item->getIdentifier();
+		if ( ! isset( $this->processing[ $id ] ) ) {
 			return false;
 		}
 
-		unset( $this->processing[ $identifier ] );
+		unset( $this->processing[ $id ] );
 
 		$this->completed ++;
 		if ( $succes ) {

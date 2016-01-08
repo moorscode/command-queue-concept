@@ -1,5 +1,7 @@
 <?php
 
+namespace Moorscode\CommandQueue;
+
 /**
  * Class AbstractCommand
  */

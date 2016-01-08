@@ -1,12 +1,14 @@
 <?php
 
+namespace Moorscode\CommandQueue;
+
 /**
  * Class Priority
  */
 class CommandPriority {
-	const HIGH = 100;
+	const HIGH = 1000;
 	const NORMAL = 0;
-	const LOW = - 100;
+	const LOW = - 1000;
 
 	/**
 	 * @var mixed

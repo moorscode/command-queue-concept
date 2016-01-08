@@ -1,5 +1,9 @@
 <?php
 
+namespace Moorscode;
+
+use Moorscode\CommandQueue\CommandInterface;
+
 /**
  * Created by PhpStorm.
  * User: jip
@@ -8,11 +12,17 @@
  */
 class TestCommand implements CommandInterface {
 
+	private $message;
+
+	public function __construct( $message ) {
+		$this->message = $message;
+	}
+
 	/**
 	 * @return bool
 	 */
 	function execute() {
-		echo 'Test Command executed.';
+		echo $this->message;
 
 		return true;
 	}
