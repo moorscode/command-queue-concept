@@ -51,13 +51,13 @@ class MemoryStorage implements StorageInterface {
 	}
 
 	/**
-	 * @param CommandInterface $command
 	 * @param string $after_command_id
+	 * @param CommandInterface $command
 	 * @param int $priority
 	 *
 	 * @return bool
 	 */
-	public function stackCommand( CommandInterface $command, $after_command_id, $priority ) {
+	public function stackCommand( $after_command_id, CommandInterface $command, $priority ) {
 		$item = new QueueItem( $command, $priority );
 		$item->setPrerequiste( $after_command_id );
 
@@ -94,28 +94,34 @@ class MemoryStorage implements StorageInterface {
 			return false;
 		}
 
+		// Local copy of array.
 		$test = $this->priority;
 
 		$found = false;
+
 		while ( false === $found ) {
+			// Checked all, none found. Exit.
 			if ( empty( $test ) ) {
 				return false;
 			}
 
 			$keys = array_keys( $test );
 			rsort( $keys, SORT_NUMERIC );
+			$index = current($keys);
 
-			$id = array_shift( $test[ $keys[0] ] );
+			// Get next item in current priority.
+			$id = array_shift( $test[ $index ] );
 
-			// Clean up.
-			if ( empty( $test[ $keys[0] ] ) ) {
-				unset( $test[ $keys[0] ] );
+			// Clean up, so we move to the next priority.
+			if ( empty( $test[ $index ] ) ) {
+				unset( $test[ $index ] );
 			}
 
 			if ( ! isset( $this->commands[ $id ] ) ) {
 				return false;
 			}
 
+			// Get the command for the identifier.
 			$item = $this->commands[ $id ];
 
 			$prerequisite = $item->getPrerequisite();
@@ -124,16 +130,16 @@ class MemoryStorage implements StorageInterface {
 			}
 		}
 
-		$index = array_search( $id, $this->priority[ $keys[0] ] );
-		unset( $this->priority[ $keys[0] ][ $index ] );
+		$id_index = array_search( $id, $this->priority[ $index ] );
+		unset( $this->priority[ $index ][ $id_index ] );
 
 		// Clean up.
-		if ( empty( $this->priority[ $keys[0] ] ) ) {
-			unset( $this->priority[ $keys[0] ] );
+		if ( empty( $this->priority[ $index ] ) ) {
+			unset( $this->priority[ $index ] );
 		}
 
+		// Remove from commands stack, push into processing stack.
 		unset( $this->commands[ $id ] );
-
 		$this->processing[ $id ] = $item;
 
 		return $item;
@@ -145,7 +151,7 @@ class MemoryStorage implements StorageInterface {
 	 *
 	 * @return bool
 	 */
-	public function finishCommand( QueueItem $item, $succes ) {
+	public function finishCommand( QueueItem $item, $succes = true ) {
 		$id = $item->getIdentifier();
 		if ( ! isset( $this->processing[ $id ] ) ) {
 			return false;

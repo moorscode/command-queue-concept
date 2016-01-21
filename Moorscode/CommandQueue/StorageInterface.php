@@ -20,13 +20,13 @@ interface StorageInterface {
 	public function addCommand( CommandInterface $command, $priority );
 
 	/**
-	 * @param CommandInterface $command
 	 * @param string $after_command_id
+	 * @param CommandInterface $command
 	 * @param int $priority
 	 *
 	 * @return mixed
 	 */
-	public function stackCommand( CommandInterface $command, $after_command_id, $priority );
+	public function stackCommand( $after_command_id, CommandInterface $command, $priority );
 	/**
 	 * Get the next item from the queue and connect identifier to it
 	 *

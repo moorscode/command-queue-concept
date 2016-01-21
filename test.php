@@ -3,6 +3,7 @@
 namespace Moorscode\CommandQueue;
 
 use Moorscode\TestCommand;
+use Moorscode\TestStorage;
 
 require 'autloader.php';
 
@@ -12,12 +13,12 @@ $storage = new MemoryStorage();
 $queue = new CommandQueue( $storage );
 $queue->add( new TestCommand( '25' ), 25 );
 $queue->add( new TestCommand( 'normal 1' ) );
+$queue->add( new TestCommand( 'LOW' ), CommandPriority::LOW );
 $queue->add( new TestCommand( 'normal 2' ) );
 $queue->add( new TestCommand( 'normal 3' ) );
-$queue->add( new TestCommand( 'LOW' ), CommandPriority::LOW );
 
 $id = $queue->add( new TestCommand( '-25' ), - 25 );
-$queue->stack( new TestCommand( 'HIGH, but prerequisite -25' ), $id, CommandPriority::HIGH );
+$queue->stack( $id, new TestCommand( 'HIGH, but prerequisite -25' ), CommandPriority::HIGH );
 
 $queue->add( new TestCommand( 'HIGH' ), CommandPriority::HIGH );
 

@@ -45,21 +45,29 @@ class CommandQueue {
 	/**
 	 * Stack a command after another
 	 *
+	 * @param string|int $prerequisite ID
 	 * @param CommandInterface $command
-	 * @param string $prerequisite ID
 	 * @param int $priority
 	 *
 	 * @return mixed
 	 */
-	public function stack( CommandInterface $command, $prerequisite, $priority = CommandPriority::NORMAL ) {
+	public function stack( $prerequisite, CommandInterface $command, $priority = CommandPriority::NORMAL ) {
+		if ( empty( $prerequisite ) ) {
+			throw new \InvalidArgumentException( 'Prerequisite cannot be empty.' );
+		}
+
+		if ( ! is_string( $prerequisite ) && ! is_integer( $prerequisite ) ) {
+			throw new \InvalidArgumentException( 'Prequisite expected to be integer or string got ' . gettype($prerequisite ) );
+		}
+
 		if ( ! is_numeric( $priority ) ) {
-			throw new \InvalidArgumentException( 'Expected number got ' . gettype( $priority ) );
+			throw new \InvalidArgumentException( 'Priority expected to be number got ' . gettype( $priority ) );
 		}
 
 		$priority = $this->prioritySanitizer->sanitize( $priority );
 
 		// Add to storage
-		return $this->storage->stackCommand( $command, $prerequisite, $priority );
+		return $this->storage->stackCommand( $prerequisite, $command, $priority );
 	}
 
 	/**

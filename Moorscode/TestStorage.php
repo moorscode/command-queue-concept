@@ -1,8 +1,11 @@
 <?php
 
-namespace Moorscode\CommandQueue;
+namespace Moorscode;
 
-use Moorscode\TestCommand;
+use Moorscode\CommandQueue\StorageInterface;
+use Moorscode\CommandQueue\CommandInterface;
+use Moorscode\CommandQueue\QueueItem;
+use Moorscode\CommandQueue\CommandPriority;
 
 /**
  * Class TestStorage
@@ -41,13 +44,13 @@ class TestStorage implements StorageInterface {
 
 
 	/**
-	 * @param CommandInterface $command
 	 * @param string $after_command_id
+	 * @param CommandInterface $command
 	 * @param int $priority
 	 *
 	 * @return mixed
 	 */
-	public function stackCommand( CommandInterface $command, $after_command_id, $priority ) {
+	public function stackCommand( $after_command_id, CommandInterface $command, $priority ) {
 		printf( 'DBQ: Stacking command after %s.<br>', $after_command_id );
 
 		return new QueueItem( new TestCommand( sprintf( 'DBQ: Stacked after %s.', $after_command_id ) ), CommandPriority::NORMAL );
