@@ -13,6 +13,7 @@ use Moorscode\CommandQueue\CommandPriority;
  */
 class TestStorage implements StorageInterface {
 
+	/** @var array List of commands */
 	private $queue = array();
 
 	/**
