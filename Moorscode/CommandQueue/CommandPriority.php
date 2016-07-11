@@ -22,7 +22,7 @@ class CommandPriority implements PriorityInterface {
 		$status = round( $in_status, 0 );
 		$status = min( self::HIGH, max( self::LOW, $status ) );
 
-		if ( $in_status !== $status ) {
+		if ( $in_status != $status ) {
 			trigger_error( sprintf( 'Priority has been normalized from %s to %d.', $in_status, $status ), E_USER_NOTICE );
 		}
 

@@ -15,7 +15,7 @@ $queue->add( new TestCommand( '25' ), 25 );
 $queue->add( new TestCommand( 'normal 1' ) );
 $queue->add( new TestCommand( 'LOW' ), CommandPriority::LOW );
 $queue->add( new TestCommand( 'normal 2' ) );
-$queue->add( new TestCommand( 'normalized', 2.14 ) );
+$queue->add( new TestCommand( 'normalized to 2'), 2.14 );
 $queue->add( new TestCommand( 'normal 3' ) );
 
 $id = $queue->add( new TestCommand( '-25' ), -25 );
