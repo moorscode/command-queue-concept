@@ -24,9 +24,17 @@ class TestStorage implements StorageInterface {
 	 * @return bool
 	 */
 	public function addCommand( CommandInterface $command, $priority ) {
-		printf( 'DBQ: Adding command at priority %s.<br>', $priority );
 
-		$this->queue[] = new QueueItem( new TestCommand( 'Test Command.' ), CommandPriority::NORMAL );
+		printf( '<br>DBQ: Adding command at priority %s.', $priority );
+
+		$id = uniqid();
+
+		$item = new QueueItem( new TestCommand( 'Test Command.' ), CommandPriority::NORMAL );
+		$item->setIdentifier( $id );
+		$this->queue[$id] = $item;
+
+		return $id;
+
 	}
 
 	/**
@@ -36,12 +44,11 @@ class TestStorage implements StorageInterface {
 	 */
 	public function getNextCommand() {
 
-		// TODO: Implement getNextCommand() method.
-		echo 'DBQ: Getting next command.<br>';
+		echo '<br>DBQ: Getting next command.';
 
 		return array_pop( $this->queue );
-	}
 
+	}
 
 	/**
 	 * @param string $after_command_id
@@ -51,9 +58,11 @@ class TestStorage implements StorageInterface {
 	 * @return mixed
 	 */
 	public function stackCommand( $after_command_id, CommandInterface $command, $priority ) {
-		printf( 'DBQ: Stacking command after %s.<br>', $after_command_id );
 
-		return new QueueItem( new TestCommand( sprintf( 'DBQ: Stacked after %s.', $after_command_id ) ), CommandPriority::NORMAL );
+		printf( '<br>DBQ: Stacking command after %s.', $after_command_id );
+
+		return new QueueItem( new TestCommand( sprintf( '<br>DBQ: Stacked after %s.', $after_command_id ) ), CommandPriority::NORMAL );
+
 	}
 
 	/**
@@ -63,6 +72,8 @@ class TestStorage implements StorageInterface {
 	 * @return bool
 	 */
 	public function finishCommand( QueueItem $item, $succes ) {
-		printf( 'DBQ: Finishing command %s.<br>', $item->getIdentifier() );
+
+		printf( '<br>DBQ: Finishing command %s.', $item->getIdentifier() );
+
 	}
 }

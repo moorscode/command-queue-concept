@@ -7,8 +7,8 @@ use Moorscode\TestStorage;
 
 require 'autloader.php';
 
-$storage = new MemoryStorage();
-//$storage = new TestStorage();
+//$storage = new MemoryStorage();
+$storage = new TestStorage();
 
 $queue = new CommandQueue( $storage );
 $queue->add( new TestCommand( '25' ), 25 );
