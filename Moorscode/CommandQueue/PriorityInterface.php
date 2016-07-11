@@ -9,7 +9,7 @@ namespace Moorscode\CommandQueue;
 interface PriorityInterface {
 	const HIGH = 1000;
 	const NORMAL = 0;
-	const LOW = - 1000;
+	const LOW = -1000;
 
 	/**
 	 * Sanitize priority

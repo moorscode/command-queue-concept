@@ -19,7 +19,7 @@ class CommandPriority implements PriorityInterface {
 			$in_status = self::NORMAL;
 		}
 
-		$status = intval( $in_status );
+		$status = round( $in_status, 0 );
 		$status = min( self::HIGH, max( self::LOW, $status ) );
 
 		if ( $in_status !== $status ) {
