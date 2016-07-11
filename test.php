@@ -5,10 +5,10 @@ namespace Moorscode\CommandQueue;
 use Moorscode\TestCommand;
 use Moorscode\TestStorage;
 
-require 'autloader.php';
+require 'autoloader.php';
 
-//$storage = new MemoryStorage();
-$storage = new TestStorage();
+$storage = new MemoryStorage();
+//$storage = new TestStorage();
 
 $queue = new CommandQueue( $storage );
 $queue->add( new TestCommand( '25' ), 25 );
